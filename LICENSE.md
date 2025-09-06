@@ -1,6 +1,6 @@
     --- SOFTWARE ---
 
-Copyright (c) 2024 [Graphene-BSM](https://graphene-bsm.com)
+Copyright (c) 2024-2025 [Graphene-BSM](https://graphene-bsm.com) and more specifically Jonathan von Teichmeister a.k.a. [douzzel](https://github.com/douzzel)
 
 _
 
