@@ -1,0 +1,168 @@
+<!--
+=========================================================
+* Argon Dashboard 2 - v2.0.4
+=========================================================
+
+* Product Page: https://www.creative-tim.com/product/argon-dashboard
+* Copyright 2022 Creative Tim (https://www.creative-tim.com)
+* Licensed under MIT (https://www.creative-tim.com/license)
+* Coded by Creative Tim
+* Modified for final use by Graphene-BSM
+
+=========================================================
+
+* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
+-->
+
+<?php
+  session_start();
+  require "../config.php";
+  require "../common.php";
+  try {
+    $connect = new PDO($dsn, $username, $password, $options);
+    if(isset($_POST["login"])) {
+      if(empty($_POST["username"]) || empty($_POST["password"])) {
+        $message = "<strong>ERROR :</strong> All fields are required!<br>";
+      }
+      else {
+        $query = "SELECT * FROM users WHERE username = :username AND password = :password";
+        $statement = $connect->prepare($query);
+        $statement->execute(
+          array(
+          'username' => $_POST["username"],
+          'password' => hash('sha256', $_POST["password"])
+          )
+        );
+        $count = $statement->rowCount();
+        if($count > 0) {
+          $_SESSION["username"] = $_POST["username"];
+          $_SESSION["type"] = "";
+          $_SESSION["action"] = "";
+          try {
+            $sql = "UPDATE users SET `last_login` = NOW() WHERE username = :username AND password = :password";
+            $statement = $connect ->prepare($sql);
+            $statement->execute(
+              array(
+              'username' => $_POST["username"],
+              'password' => $_POST["password"]
+              )
+            );
+            $message = "";
+          }
+          catch(PDOException $error) {
+            $message = $sql . "<strong>ERROR :</strong><br>" . $error->getMessage() . "<br>";
+          }
+?>
+          <script>
+            window.location = "./pages/dashboard.php";
+          </script>
+<?php          
+        }
+        else {
+          $message = '<strong>ERROR :</strong> Wrong Data, please try again<br>';
+        }
+      }
+    }
+  }
+  catch(PDOException $error) {
+    $message = $error->getMessage();
+  }
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="apple-touch-icon" sizes="76x76" href="./assets/img/apple-icon.png">
+    <link rel="icon" type="image/png" href="./assets/img/favicon.png">
+    <title>
+      myGenghis-Bridge - Sign In
+    </title>
+    <!--     Fonts and icons     -->
+    <link href="https://fonts.bunny.net/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+    <!-- Nucleo Icons -->
+    <link href="./assets/css/nucleo-icons.css" rel="stylesheet" />
+    <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- Font Awesome Icons -->
+    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <link href="./assets/css/nucleo-svg.css" rel="stylesheet" />
+    <!-- CSS Files -->
+    <link id="pagestyle" href="./assets/css/argon-dashboard.css?v=2.0.4" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="main-content  mt-0">
+      <section>
+        <div class="page-header min-vh-100">
+          <div class="container">
+            <div class="row">
+              <div class="col-xl-4 col-lg-5 col-md-7 d-flex flex-column mx-lg-0 mx-auto">
+                <div class="card card-plain">
+                  <div class="card-header pb-0 text-start">
+                    <h2>myGenghis-Bridge</h2>
+                    <br />&nbsp;<br />
+                    <h4 class="font-weight-bolder">Sign In</h4>
+                    <?php
+                      if(isset($message)) {
+                        echo '<p cass="mb-0" style="color: red;">'.$message.'</p>';
+                      }
+                    ?>
+                    <p class="mb-0">Enter your email and password to sign in</p>
+                  </div>
+                  <div class="card-body">
+                    <form role="form" method="post">
+                      <div class="mb-3">
+                        <input type="email" name="username" class="form-control form-control-lg" placeholder="Email" aria-label="Email" required="true" aria-required="true">
+                      </div>
+                      <div class="mb-3">
+                        <input type="password" name="password" class="form-control form-control-lg" placeholder="Password" aria-label="Password"  required="true" aria-required="true">
+                      </div>
+                      <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="rememberMe">
+                        <label class="form-check-label" for="rememberMe">Remember me</label>
+                      </div>
+                      <div class="text-center">
+                        <button type="submit" name="login" class="btn btn-lg btn-primary btn-lg w-100 mt-4 mb-0">Sign in</button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="card-footer text-center pt-0 px-lg-2 px-1">
+                    <p class="mb-4 text-sm mx-auto">
+                      Don't have an account?
+                      <a href="./pages/sign-up.php" class="text-primary text-gradient font-weight-bold">Sign up</a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <div class="col-6 d-lg-flex d-none h-100 my-auto pe-0 position-absolute top-0 end-0 text-center justify-content-center flex-column">
+                <div class="position-relative bg-gradient-primary h-100 m-3 px-7 border-radius-lg d-flex flex-column justify-content-center overflow-hidden" style="background-image: url('https://raw.githubusercontent.com/creativetimofficial/public-assets/master/argon-dashboard-pro/assets/img/signin-ill.jpg');
+            background-size: cover;">
+                  <span class="mask bg-gradient-primary opacity-6"></span>
+                  <h4 class="mt-5 text-white font-weight-bolder position-relative">"Data is the new currency"</h4>
+                  <p class="text-white position-relative">The more effortless the software is to use, the more work the developer put into creating it.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <!--   Core JS Files   -->
+    <script src="./assets/js/core/popper.min.js"></script>
+    <script src="./assets/js/core/bootstrap.min.js"></script>
+    <script src="./assets/js/plugins/perfect-scrollbar.min.js"></script>
+    <script src="./assets/js/plugins/smooth-scrollbar.min.js"></script>
+    <script>
+      var win = navigator.platform.indexOf('Win') > -1;
+      if (win && document.querySelector('#sidenav-scrollbar')) {
+        var options = {
+          damping: '0.5'
+        }
+        Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+      }
+    </script>
+    <!-- Control Center for Soft Dashboard: parallax effects, scripts for the example pages etc -->
+    <script src="./assets/js/argon-dashboard.min.js?v=2.0.4"></script>
+  </body>
+</html>
